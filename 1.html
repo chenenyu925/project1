@@ -1,0 +1,682 @@
+!DOCTYPE html
+html lang=zh-TW
+head
+    meta charset=UTF-8
+    meta name=viewport content=width=device-width, initial-scale=1.0
+    title小血滴的大秘密 - 血跡分析報告 (Web Slide)title
+    !-- Tailwind CSS for styling --
+    script src=httpscdn.tailwindcss.comscript
+    !-- Google Fonts --
+    link href=httpsfonts.googleapis.comcss2family=Noto+Sans+TCwght@400;500;700&family=Urbanistwght@400;700&display=swap rel=stylesheet
+    style
+        body {
+            font-family 'Urbanist', 'Noto Sans TC', sans-serif;
+            background-color #171717;  neutral-900 
+            color #f5f5f5;  neutral-100 
+            overflow hidden;  Hide scrollbars for presentation mode 
+        }
+        
+         Animations 
+        @keyframes fadeIn {
+            from { opacity 0; transform translateY(10px); }
+            to { opacity 1; transform translateY(0); }
+        }
+        
+        .slide-content {
+            animation fadeIn 0.5s ease-out forwards;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform translateY(-5%); }
+            50% { transform translateY(5%); }
+        }
+        
+        .animate-bounce-custom {
+            animation bounce 2s infinite;
+        }
+
+         Print Styles 
+        @media print {
+            body { overflow visible; background-color #171717; -webkit-print-color-adjust exact; print-color-adjust exact; }
+            .no-print { display none !important; }
+            .slide-container { 
+                display flex !important; 
+                page-break-after always; 
+                height 100vh; 
+                width 100vw;
+                border-bottom 1px solid #333;
+            }
+            .slide-wrapper {
+                transform none !important;
+                max-width none !important;
+                padding 20px !important;
+            }
+        }
+    style
+    !-- Icons (Lucide equivalent SVGs) --
+    script
+        const icons = {
+            droplets `svg xmlns=httpwww.w3.org2000svg width=24 height=24 viewBox=0 0 24 24 fill=none stroke=currentColor stroke-width=2 stroke-linecap=round stroke-linejoin=roundpath d=M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7.29 6.75 7 5.3c-.29 1.45-1.14 2.84-2.29 3.76S3 11.1 3 12.25c0 2.22 1.8 4.05 4 4.05zpathpath d=M12.56 6.6A10.97 10.97 0 0 0 14 3.02c.5 2.5 2 4.9 4 6.5s3 3.5 3 5.5a6.98 6.98 0 0 1-11.91 4.35pathsvg`,
+            target `svg xmlns=httpwww.w3.org2000svg width=24 height=24 viewBox=0 0 24 24 fill=none stroke=currentColor stroke-width=2 stroke-linecap=round stroke-linejoin=roundcircle cx=12 cy=12 r=10circlecircle cx=12 cy=12 r=6circlecircle cx=12 cy=12 r=2circlesvg`,
+            activity `svg xmlns=httpwww.w3.org2000svg width=24 height=24 viewBox=0 0 24 24 fill=none stroke=currentColor stroke-width=2 stroke-linecap=round stroke-linejoin=roundpath d=M22 12h-4l-3 9L9 3l-3 9H2pathsvg`,
+            bookOpen `svg xmlns=httpwww.w3.org2000svg width=24 height=24 viewBox=0 0 24 24 fill=none stroke=currentColor stroke-width=2 stroke-linecap=round stroke-linejoin=roundpath d=M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2zpathpath d=M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7zpathsvg`,
+            beaker `svg xmlns=httpwww.w3.org2000svg width=24 height=24 viewBox=0 0 24 24 fill=none stroke=currentColor stroke-width=2 stroke-linecap=round stroke-linejoin=roundpath d=M4.5 3h15pathpath d=M6 3v16a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V3pathpath d=M6 14h12pathsvg`,
+            fileText `svg xmlns=httpwww.w3.org2000svg width=24 height=24 viewBox=0 0 24 24 fill=none stroke=currentColor stroke-width=2 stroke-linecap=round stroke-linejoin=roundpath d=M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2zpathpolyline points=14 2 14 8 20 8polylineline x1=16 y1=13 x2=8 y2=13lineline x1=16 y1=17 x2=8 y2=17lineline x1=10 y1=9 x2=8 y2=9linesvg`,
+            ruler `svg xmlns=httpwww.w3.org2000svg width=24 height=24 viewBox=0 0 24 24 fill=none stroke=currentColor stroke-width=2 stroke-linecap=round stroke-linejoin=roundpath d=M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Zpathpath d=m14.5 12.5 2-2pathpath d=m11.5 9.5 2-2pathpath d=m8.5 6.5 2-2pathpath d=m17.5 15.5 2-2pathsvg`,
+            alertTriangle `svg xmlns=httpwww.w3.org2000svg width=24 height=24 viewBox=0 0 24 24 fill=none stroke=currentColor stroke-width=2 stroke-linecap=round stroke-linejoin=roundpath d=m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Zpathline x1=12 y1=9 x2=12 y2=13lineline x1=12 y1=17 x2=12.01 y2=17linesvg`,
+            sigma `svg xmlns=httpwww.w3.org2000svg width=24 height=24 viewBox=0 0 24 24 fill=none stroke=currentColor stroke-width=2 stroke-linecap=round stroke-linejoin=roundpath d=M18 7V4H6l6 8-6 8h12v-3pathsvg`,
+            printer `svg xmlns=httpwww.w3.org2000svg width=24 height=24 viewBox=0 0 24 24 fill=none stroke=currentColor stroke-width=2 stroke-linecap=round stroke-linejoin=roundpolyline points=6 9 6 2 18 2 18 9polylinepath d=M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2pathrect x=6 y=14 width=12 height=8rectsvg`,
+            chevronLeft `svg xmlns=httpwww.w3.org2000svg width=24 height=24 viewBox=0 0 24 24 fill=none stroke=currentColor stroke-width=2 stroke-linecap=round stroke-linejoin=roundpolyline points=15 18 9 12 15 6polylinesvg`,
+            chevronRight `svg xmlns=httpwww.w3.org2000svg width=24 height=24 viewBox=0 0 24 24 fill=none stroke=currentColor stroke-width=2 stroke-linecap=round stroke-linejoin=roundpolyline points=9 18 15 12 9 6polylinesvg`
+        };
+    script
+head
+body class=flex flex-col h-screen
+
+    !-- Progress Bar --
+    div class=h-1 bg-neutral-800 w-full no-print
+        div id=progress-bar class=h-full bg-red-600 transition-all duration-500 ease-out style=width 0%div
+    div
+
+    !-- Main Content Area --
+    div id=slide-viewport class=flex-1 relative flex items-center justify-center p-4 mdp-12
+        !-- Slides will be injected here --
+    div
+
+    !-- Navigation Controls --
+    div class=h-20 border-t border-neutral-800 flex items-center justify-between px-8 bg-neutral-90050 backdrop-blur-sm z-50 no-print
+        div class=text-neutral-500 text-sm font-mono id=slide-counter
+           SLIDE 1  13
+        div
+
+        div class=flex gap-4
+           button onclick=window.print() class=p-3 rounded-full hoverbg-neutral-800 text-neutral-400 hovertext-white transition-colors title=列印  存成 PDF
+             span class=w-6 h-6 block id=icon-printerspan
+           button
+           div class=w-px h-8 bg-neutral-700 mx-2 self-centerdiv
+           button onclick=prevSlide() class=p-3 rounded-full hoverbg-neutral-800 text-neutral-400 hovertext-white transition-colors id=btn-prev
+             span class=w-6 h-6 block id=icon-prevspan
+           button
+           button onclick=nextSlide() class=p-3 rounded-full bg-red-600 hoverbg-red-700 text-white transition-colors shadow-lg shadow-red-90020 id=btn-next
+             span class=w-6 h-6 block id=icon-nextspan
+           button
+        div
+    div
+
+    !-- JavaScript Logic --
+    script
+         --- Data ---
+        const slides = [
+            {
+                id 0,
+                type 'cover',
+                content `
+                    div class=flex flex-col items-center justify-center h-full text-center space-y-8 slide-content
+                        div class=relative
+                            div class=text-red-600 opacity-80 animate-bounce-custom w-20 h-20 mx-auto${icons.droplets.replace('width=24 height=24', 'width=80 height=80')}div
+                            div class=absolute top-0 left-0 w-full h-full bg-red-600 blur-3xl opacity-20 rounded-fulldiv
+                        div
+                        h1 class=text-5xl mdtext-7xl font-bold tracking-tight
+                            小血滴的大秘密
+                            span class=block text-2xl mdtext-4xl mt-4 text-red-600 font-normal
+                                血跡型態與物理變因之關聯分析
+                            span
+                        h1
+                        div class=h-1 w-32 bg-red-600 rounded-full mx-autodiv
+                        div class=text-xl space-y-2
+                            p第 03 組p
+                            p class=text-neutral-400組員：09 陳思予 ｜ 與其他組員p
+                        div
+                        p class=text-sm text-neutral-500 absolute bottom-10 no-print按方向鍵或點擊箭頭開始 (共13頁)p
+                    div
+                `
+            },
+            {
+                id 1,
+                title 研究動機與目的,
+                icon icons.target,
+                content `
+                    div class=grid grid-cols-1 mdgrid-cols-2 gap-8 h-full items-center slide-content
+                        div class=space-y-6
+                            div class=bg-neutral-800 p-6 rounded-lg border-l-4 border-red-600 shadow-lg
+                                h3 class=text-2xl font-bold mb-4 flex items-center gap-2
+                                    span class=w-6 h-6 text-red-600${icons.activity}span 研究動機
+                                h3
+                                ul class=list-disc list-inside space-y-3 text-lg text-gray-300
+                                    li刑偵劇中的鑑識科學如何運作？li
+                                    li液體撞擊地面的能量如何轉換？li
+                                    li生活中的流體力學現象探究。li
+                                ul
+                            div
+                            div class=bg-neutral-800 p-6 rounded-lg border-l-4 border-blue-600 shadow-lg
+                                h3 class=text-2xl font-bold mb-4 flex items-center gap-2
+                                    span class=w-6 h-6 text-blue-600${icons.target}span 研究目標
+                                h3
+                                div class=space-y-2 text-lg text-gray-300
+                                    p1. 探討 span class=text-white font-bold滴落高度span 與直徑的關係p
+                                    p2. 分析 span class=text-white font-bold表面材質span 對擴散的影響p
+                                    p3. 驗證 span class=text-white font-bold液滴體積span 的能量效應p
+                                div
+                            div
+                        div
+                        div class=flex items-center justify-center h-64 mdh-full bg-neutral-800 rounded-lg border border-dashed border-neutral-600 relative overflow-hidden group
+                            div class=text-center p-8
+                                p class=text-neutral-400 mb-2[ 圖片區域 ]p
+                                p class=text-sm text-neutral-500建議放入：鑑識現場示意圖 或 實驗器材全家福p
+                            div
+                            div class=absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size20px_20px]div
+                        div
+                    div
+                `
+            },
+            {
+                id 2,
+                title 物理模型：能量守恆,
+                icon icons.bookOpen,
+                content `
+                    div class=flex flex-col h-full gap-8 justify-center slide-content
+                        div class=bg-neutral-800 p-8 rounded-xl border border-neutral-600 shadow-2xl
+                            h3 class=text-2xl font-bold mb-6 text-center text-red-500液滴撞擊的能量轉換旅程h3
+                            div class=flex flex-col mdflex-row items-center justify-between gap-4 text-center
+                                div class=p-4 bg-neutral-700 rounded-lg flex-1
+                                    p class=text-sm text-gray-400 mb-2初始狀態 (Initial)p
+                                    h4 class=text-xl font-bold text-white mb-1重力位能h4
+                                    p class=font-mono text-yellow-400 text-lgUg = mghp
+                                div
+                                div class=text-2xl text-gray-500➜div
+                                div class=p-4 bg-neutral-700 rounded-lg flex-1
+                                    p class=text-sm text-gray-400 mb-2撞擊瞬間 (Impact)p
+                                    h4 class=text-xl font-bold text-white mb-1動能h4
+                                    p class=font-mono text-blue-400 text-lgK = ½mv²p
+                                div
+                                div class=text-2xl text-gray-500➜div
+                                div class=p-4 bg-neutral-700 rounded-lg flex-1 border border-red-90050
+                                    p class=text-sm text-gray-400 mb-2擴散結果 (Result)p
+                                    h4 class=text-xl font-bold text-white mb-1表面能 + 摩擦功h4
+                                    p class=font-mono text-green-400 text-lgW = σΔA + Wfp
+                                div
+                            div
+                        div
+                        div class=grid grid-cols-1 mdgrid-cols-2 gap-6
+                            div class=p-4
+                                h4 class=font-bold text-red-500 mb-2★ 關鍵推論h4
+                                p class=text-gray-300若動能越大 (高度高、質量大)，能克服表面張力做更多的功，使血跡面積 (ΔA) 變大。p
+                            div
+                            div class=p-4
+                                h4 class=font-bold text-yellow-500 mb-2★ 阻力效應h4
+                                p class=text-gray-300若接觸面粗糙，摩擦力做功 (Wf) 增加，會消耗掉原本可用於擴散的能量，導致直徑變小。p
+                            div
+                        div
+                    div
+                `
+            },
+            {
+                id 3,
+                title 實驗前置：假血配製,
+                icon icons.beaker,
+                content `
+                    div class=grid grid-cols-1 mdgrid-cols-2 gap-8 h-full slide-content
+                        div class=flex flex-col justify-center space-y-6
+                            div class=bg-neutral-800 p-6 rounded-xl border border-neutral-700
+                                h3 class=text-xl font-bold text-red-500 mb-4為什麼不用真血？h3
+                                p class=text-gray-300 leading-relaxed血液具有黏滯性與特定的表面張力 (約 55-60 mNm)，純水 (約 72 mNm) 無法完美模擬。p
+                            div
+                            div class=bg-neutral-800 p-6 rounded-xl border border-neutral-700 relative overflow-hidden
+                                div class=absolute top-0 right-0 w-20 h-20 bg-red-900 rounded-bl-full opacity-20div
+                                h3 class=text-xl font-bold text-white mb-4黃金配方 (參考 3619.jpg)h3
+                                ul class=space-y-4
+                                    li class=flex items-center gap-3
+                                        span class=w-8 h-8 rounded-full bg-red-600 flex items-center justify-center font-bold1span
+                                        span class=text-lg番茄醬：13 公克 (提供黏滯性)span
+                                    li
+                                    li class=flex items-center gap-3
+                                        span class=w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center font-bold2span
+                                        span class=text-lg蒸餾水：10 毫升 (調整流動性)span
+                                    li
+                                    li class=flex items-center gap-3
+                                        span class=w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center font-bold3span
+                                        span class=text-lg紅墨水：適量 (染色觀察)span
+                                    li
+                                ul
+                            div
+                        div
+                        div class=bg-neutral-800 rounded-lg flex items-center justify-center border-2 border-dashed border-neutral-600 relative
+                            div class=text-center
+                                div class=mx-auto text-neutral-500 mb-4 w-12 h-12${icons.fileText.replace('width=24 height=24', 'width=48 height=48')}div
+                                p class=text-lg font-bold text-neutral-300在此插入筆記 3619.jpgp
+                                p class=text-sm text-neutral-500 mt-2假血配方表 & 游標尺圖解p
+                            div
+                        div
+                    div
+                `
+            },
+            {
+                id 4,
+                title 變因一：滴落高度 vs 血跡直徑,
+                icon icons.ruler,
+                content `
+                    div class=flex flex-col h-full gap-6 slide-content
+                        div class=flex justify-between items-start
+                            div class=space-y-2
+                                h3 class=text-2xl font-bold實驗數據展示h3
+                                p class=text-gray-400控制變因：同一滴管、相同地面（紙）、相同配方p
+                            div
+                            div class=px-4 py-2 bg-neutral-800 rounded border border-neutral-600 font-mono text-sm操作變因：15cm ~ 150cmdiv
+                        div
+                        div class=flex-1 grid grid-cols-1 mdgrid-cols-3 gap-6
+                            div class=mdcol-span-2 bg-neutral-800 rounded-lg border-2 border-dashed border-neutral-600 flex flex-col items-center justify-center relative p-4
+                                div class=text-neutral-600 mb-4 w-12 h-12${icons.activity.replace('width=24 height=24', 'width=48 height=48')}div
+                                p class=text-lg font-bold text-neutral-300在此插入筆記 3621.jpg (圖表)p
+                                p class=text-sm text-neutral-500 mt-2折線圖顯示正相關趨勢p
+                            div
+                            div class=space-y-4
+                                div class=bg-neutral-800 p-4 rounded-lg border-l-4 border-red-500
+                                    p class=text-sm text-gray-400最低點 (15cm)p
+                                    p class=text-2xl font-bold text-white0.896 cmp
+                                div
+                                div class=bg-neutral-800 p-4 rounded-lg border-l-4 border-red-600
+                                    p class=text-sm text-gray-400中點 (90cm)p
+                                    p class=text-2xl font-bold text-white1.341 cmp
+                                div
+                                div class=bg-neutral-800 p-4 rounded-lg border-l-4 border-red-700
+                                    p class=text-sm text-gray-400最高點 (150cm)p
+                                    p class=text-2xl font-bold text-white1.412 cmp
+                                div
+                            div
+                        div
+                    div
+                `
+            },
+            {
+                id 5,
+                title 變因一：趨勢分析,
+                icon icons.activity,
+                content `
+                    div class=grid grid-cols-1 mdgrid-cols-2 gap-10 h-full items-center slide-content
+                        div class=space-y-8
+                            div
+                                h3 class=text-2xl font-bold text-white mb-2現象解讀h3
+                                p class=text-gray-300 text-lg leading-relaxed
+                                    隨著高度增加，直徑雖然變大，但span class=text-red-400 font-bold成長幅度逐漸趨緩span (圖表斜率變小)。
+                                p
+                                p class=text-gray-400 mt-4 text-sm border-l-2 border-red-500 pl-4
+                                    這是一個非線性關係，因為空氣阻力隨速度平方增加 (Fd ∝ v²)，高處落下的液滴並未達到真空中預期的速度。
+                                p
+                            div
+                            div
+                                h3 class=text-2xl font-bold text-white mb-2物理意義h3
+                                ul class=space-y-4
+                                    li class=flex items-start gap-3 bg-neutral-800 p-3 rounded
+                                        span class=text-red-500 font-bold1.span
+                                        spanstrong class=text-white能量轉換：strong位能轉換的動能主要用於克服表面張力做功。span
+                                    li
+                                    li class=flex items-start gap-3 bg-neutral-800 p-3 rounded
+                                        span class=text-red-500 font-bold2.span
+                                        spanstrong class=text-white極限值：strong液體表面張力會試圖將液體拉回球形，限制了無限擴散的可能。span
+                                    li
+                                ul
+                            div
+                        div
+                        div class=h-full bg-gradient-to-br from-neutral-800 to-neutral-900 rounded-xl p-8 flex items-center justify-center border border-neutral-700
+                            div class=relative w-64 h-80 flex flex-col items-center
+                                div class=absolute top-0 w-4 h-4 rounded-full bg-red-600 animate-bounce-customdiv
+                                div class=h-full w-0.5 bg-neutral-600 border-dashed border-l border-neutral-500div
+                                div class=absolute bottom-0 w-32 h-8 rounded-[50%] bg-red-700 opacity-80 scale-x-[1.5]div
+                                div class=absolute bottom-10 right-0 text-xs text-gray-500Air Resistancediv
+                                div class=absolute bottom-2 right-[-20px] text-xs text-gray-500Surface Tensiondiv
+                            div
+                        div
+                    div
+                `
+            },
+            {
+                id 6,
+                title 變因二：表面材質 - 實驗設計,
+                icon icons.fileText,
+                content `
+                    div class=grid grid-cols-1 mdgrid-cols-2 gap-8 h-full slide-content
+                        div class=flex flex-col gap-6
+                            div class=bg-neutral-800 p-6 rounded-lg border-l-4 border-yellow-500
+                                h3 class=text-xl font-bold text-yellow-500 mb-2創新驗證：如何定義「粗糙」？h3
+                                p class=text-gray-300我們不希望只是主觀判斷材質差異，因此設計了額外的span class=text-white font-bold「摩擦力測試」span。p
+                            div
+                            ul class=space-y-4 text-lg text-gray-300
+                                li class=flex items-center gap-2
+                                    div class=w-2 h-2 bg-yellow-500 rounded-fulldiv
+                                    strong實驗對象：strong 壓克力板、紙板、答案卡。
+                                li
+                                li class=flex items-center gap-2
+                                    div class=w-2 h-2 bg-yellow-500 rounded-fulldiv
+                                    strong測試方法：strong 使用滑塊在不同材質斜面上滑動，觀察滑動難易度與停止距離。
+                                li
+                                li class=flex items-center gap-2
+                                    div class=w-2 h-2 bg-yellow-500 rounded-fulldiv
+                                    strong預期結果：strong 越粗糙的表面 ➜ 摩擦係數 μk 越大 ➜ 阻礙血跡擴散。
+                                li
+                            ul
+                        div
+                        div class=bg-neutral-800 rounded-lg flex items-center justify-center border-2 border-dashed border-neutral-600 p-4
+                            div class=text-center
+                                div class=mx-auto text-neutral-500 mb-4 w-12 h-12${icons.fileText.replace('width=24 height=24', 'width=48 height=48')}div
+                                p class=text-lg font-bold text-neutral-300請插入 3623.jpg (下方手繪圖)p
+                                p class=text-sm text-neutral-500 mt-2特別強調筆記下方的「摩擦力斜面實驗」示意圖p
+                            div
+                        div
+                    div
+                `
+            },
+            {
+                id 7,
+                title 變因二：材質數據分析,
+                icon icons.activity,
+                content `
+                    div class=flex flex-col h-full gap-6 slide-content
+                        div class=grid grid-cols-1 mdgrid-cols-3 gap-4 flex-1 items-end pb-8
+                            div class=bg-neutral-800 p-4 rounded-lg border border-neutral-700 flex flex-col items-center text-center h-34 justify-end
+                                div class=w-full flex-1 bg-gradient-to-t from-gray-700 to-gray-600 mb-4 rounded flex items-center justify-center text-xs text-gray-300 relative group
+                                    span class=absolute -top-8 text-sm bg-neutral-900 px-2 py-1 rounded最光滑span
+                                div
+                                h4 class=text-xl font-bold壓克力板h4
+                                div class=mt-2 text-3xl font-bold text-red-5000.908 span class=text-smcmspandiv
+                            div
+                            div class=bg-neutral-800 p-4 rounded-lg border border-neutral-700 flex flex-col items-center text-center h-23 justify-end
+                                div class=w-full flex-1 bg-gradient-to-t from-amber-200 to-amber-100 mb-4 rounded flex items-center justify-center text-xs text-gray-600div
+                                h4 class=text-xl font-bold紙板h4
+                                div class=mt-2 text-2xl font-bold text-red-4000.879 span class=text-smcmspandiv
+                            div
+                            div class=bg-neutral-800 p-4 rounded-lg border border-neutral-700 flex flex-col items-center text-center h-12 justify-end
+                                div class=w-full flex-1 bg-neutral-200 opacity-80 mb-4 rounded flex items-center justify-center text-xs text-gray-800 border-2 border-gray-400 relative style=background-image radial-gradient(#ccc 1px, transparent 1px); background-size 4px 4px;
+                                    span class=absolute -top-8 text-sm bg-neutral-900 px-2 py-1 rounded text-white最粗糙span
+                                div
+                                h4 class=text-xl font-bold答案卡h4
+                                div class=mt-2 text-xl font-bold text-red-3000.839 span class=text-smcmspandiv
+                            div
+                        div
+                        div class=bg-neutral-800 p-6 rounded-lg border-t-2 border-red-500
+                            h3 class=text-xl font-bold mb-2 text-red-500物理結論h3
+                            p class=text-gray-300
+                                實驗證實：strong class=text-white摩擦力與血跡直徑呈負相關。strong
+                                粗糙表面的摩擦力做功 (Wf) 消耗了液滴的動能，且粗糙表面的孔隙會吸收液體，抑制橫向擴散。
+                            p
+                        div
+                    div
+                `
+            },
+            {
+                id 8,
+                title 變因三：液滴體積 - 實驗設計,
+                icon icons.droplets,
+                content `
+                    div class=grid grid-cols-1 mdgrid-cols-2 gap-8 h-full items-center slide-content
+                        div class=space-y-6
+                            h3 class=text-2xl font-bold text-white控制體積的工具h3
+                            ul class=space-y-6
+                                li class=flex items-center gap-4 bg-neutral-800 p-4 rounded-lg
+                                    div class=w-12 h-12 bg-red-900 rounded-full flex items-center justify-center font-bold text-xlLdiv
+                                    div
+                                        h4 class=text-lg font-bold text-red-400大針筒 (無針頭)h4
+                                        p class=text-sm text-gray-400開口最大，產生極大液滴p
+                                    div
+                                li
+                                li class=flex items-center gap-4 bg-neutral-800 p-4 rounded-lg
+                                    div class=w-12 h-12 bg-red-800 rounded-full flex items-center justify-center font-bold text-xlMdiv
+                                    div
+                                        h4 class=text-lg font-bold text-red-300玻璃滴管h4
+                                        p class=text-sm text-gray-400標準實驗器材，體積適中p
+                                    div
+                                li
+                                li class=flex items-center gap-4 bg-neutral-800 p-4 rounded-lg
+                                    div class=w-12 h-12 bg-red-700 rounded-full flex items-center justify-center font-bold text-xlSdiv
+                                    div
+                                        h4 class=text-lg font-bold text-red-200小針筒 (有針頭)h4
+                                        p class=text-sm text-gray-400利用內聚力控制出最小液滴p
+                                    div
+                                li
+                            ul
+                            div class=bg-neutral-800 p-4 rounded border border-neutral-600 text-sm text-gray-400
+                                strong測量技巧：strong 難以直接測量單滴體積，故採用「測量10滴總體積後除以10」的方法求平均值。
+                            div
+                        div
+                        div class=bg-neutral-800 rounded-lg flex items-center justify-center border-2 border-dashed border-neutral-600 h-full p-4
+                            div class=text-center
+                                p class=text-lg font-bold text-neutral-300請插入 3622.jpg (工具照)p
+                                p class=text-sm text-neutral-500展示三種工具的對比p
+                            div
+                        div
+                    div
+                `
+            },
+            {
+                id 9,
+                title 變因三：體積數據分析,
+                icon icons.activity,
+                content `
+                    div class=flex flex-col h-full gap-8 slide-content
+                        div class=flex flex-col mdflex-row gap-6 items-center justify-center flex-1
+                            div class=bg-neutral-800 p-6 rounded-xl border-b-8 border-red-500 flex flex-col items-center w-full mdw-13 shadow-xl
+                                p class=text-gray-400 mb-2Large Volumep
+                                h3 class=text-4xl font-bold text-white mb-20.068 span class=text-smmlspanh3
+                                p class=text-red-500 font-bold mb-4⬇p
+                                h3 class=text-3xl font-bold text-red-5001.085 span class=text-smcmspanh3
+                            div
+                            div class=text-4xl text-gray-600 font-bold&gt;div
+                            div class=bg-neutral-800 p-6 rounded-xl border-b-8 border-red-300 flex flex-col items-center w-full mdw-13 opacity-70
+                                p class=text-gray-400 mb-2Small Volumep
+                                h3 class=text-4xl font-bold text-white mb-20.025 span class=text-smmlspanh3
+                                p class=text-red-500 font-bold mb-4⬇p
+                                h3 class=text-3xl font-bold text-red-3000.644 span class=text-smcmspanh3
+                            div
+                        div
+                        div class=bg-neutral-800 p-6 rounded-xl border border-blue-50030
+                            h3 class=text-xl font-bold text-blue-400 mb-3 flex items-center gap-2
+                                span class=w-6 h-6${icons.sigma}span 物理詮釋：質量與能量
+                            h3
+                            p class=text-lg text-gray-300 leading-relaxed
+                                回歸動能公式 span class=font-mono text-yellow-400 mx-2K = ½mv²span。
+                                在落下高度相同 (速度 v 固定) 的前提下，液滴體積越大，質量 m 越大，攜帶的總動能呈線性增加。
+                                這些多餘的能量在撞擊瞬間轉化為更強大的推力，克服表面張力，造就了更大的擴散半徑。
+                            p
+                        div
+                    div
+                `
+            },
+            {
+                id 10,
+                title 誤差來源與改進探討,
+                icon icons.alertTriangle,
+                content `
+                    div class=grid grid-cols-1 mdgrid-cols-2 gap-8 h-full slide-content
+                        div class=space-y-6
+                            div class=bg-neutral-800 p-6 rounded-lg border-l-4 border-orange-500
+                                h3 class=text-xl font-bold text-orange-500 mb-2系統性誤差h3
+                                ul class=list-disc list-inside space-y-2 text-gray-300
+                                    listrong class=text-white空氣阻力：strong高處落下並非自由落體，形狀會因風阻變形。li
+                                    listrong class=text-white假血性質：strong番茄醬混合液若靜置過久，可能發生沉澱導致濃度黏度不均。li
+                                ul
+                            div
+                            div class=bg-neutral-800 p-6 rounded-lg border-l-4 border-purple-500
+                                h3 class=text-xl font-bold text-purple-500 mb-2隨機誤差h3
+                                ul class=list-disc list-inside space-y-2 text-gray-300
+                                    listrong class=text-white人為測量：strong粗糙表面的血跡邊緣呈鋸齒狀，游標尺取點具主觀性。li
+                                    listrong class=text-white落點偏移：strong高處瞄準不易，若未垂直撞擊，血跡會變成橢圓形。li
+                                ul
+                            div
+                        div
+                        div class=bg-neutral-800 p-8 rounded-lg border border-neutral-700 flex flex-col justify-center
+                            h3 class=text-2xl font-bold text-white mb-6未來的改進方向h3
+                            div class=space-y-4
+                                div class=flex items-center gap-4
+                                    div class=p-3 bg-blue-900 rounded-full text-blue-200${icons.target.replace('width=24 height=24', 'width=20 height=20')}div
+                                    p class=text-gray-300使用固定架與雷射定位，確保垂直落點。p
+                                div
+                                div class=flex items-center gap-4
+                                    div class=p-3 bg-green-900 rounded-full text-green-200${icons.activity.replace('width=24 height=24', 'width=20 height=20')}div
+                                    p class=text-gray-300引入影像分析軟體 (如 ImageJ) 計算面積，取代人工測量。p
+                                div
+                                div class=flex items-center gap-4
+                                    div class=p-3 bg-red-900 rounded-full text-red-200${icons.droplets.replace('width=24 height=24', 'width=20 height=20')}div
+                                    p class=text-gray-300使用甘油調配假血，獲得更穩定的黏滯係數。p
+                                div
+                            div
+                        div
+                    div
+                `
+            },
+            {
+                id 11,
+                title 結論與物理總結,
+                icon icons.target,
+                content `
+                    div class=h-full flex flex-col justify-between slide-content
+                        div class=grid grid-cols-1 mdgrid-cols-3 gap-6
+                            div class=bg-neutral-800 p-6 rounded-xl border-t-4 border-red-500 hovertransform hover-translate-y-2 transition duration-300
+                                div class=h-12 w-12 bg-red-900 rounded-full flex items-center justify-center mb-4 text-red-200 font-bold text-xlHdiv
+                                h3 class=text-xl font-bold mb-2高度影響h3
+                                p class=text-gray-400正相關。高度越高，位能轉換動能越多，直徑越大。p
+                            div
+                            div class=bg-neutral-800 p-6 rounded-xl border-t-4 border-yellow-500 hovertransform hover-translate-y-2 transition duration-300
+                                div class=h-12 w-12 bg-yellow-900 rounded-full flex items-center justify-center mb-4 text-yellow-200 font-bold text-xlSdiv
+                                h3 class=text-xl font-bold mb-2材質影響h3
+                                p class=text-gray-400負相關。表面越粗糙，摩擦力做功耗能，抑制擴散。p
+                            div
+                            div class=bg-neutral-800 p-6 rounded-xl border-t-4 border-blue-500 hovertransform hover-translate-y-2 transition duration-300
+                                div class=h-12 w-12 bg-blue-900 rounded-full flex items-center justify-center mb-4 text-blue-200 font-bold text-xlVdiv
+                                h3 class=text-xl font-bold mb-2體積影響h3
+                                p class=text-gray-400正相關。質量是能量的關鍵因子，大水滴破壞力更強。p
+                            div
+                        div
+                        div class=mt-8 bg-neutral-80050 p-6 rounded-lg border border-neutral-700 text-center
+                            h4 class=text-lg font-bold text-white mb-2一句話總結h4
+                            p class=text-xl text-gray-300 italic血跡的大小，是重力位能、表面張力與摩擦力三者角力的最終結果。p
+                        div
+                    div
+                `
+            },
+            {
+                id 12,
+                title ,
+                icon ,
+                content `
+                    div class=flex flex-col items-center justify-center h-full text-center space-y-8 slide-content
+                        h2 class=text-6xl font-bold text-white tracking-widestQ & Ah2
+                        p class=text-2xl text-gray-400感謝聆聽，歡迎提問p
+                        div class=w-24 h-1 bg-red-600 rounded-fulldiv
+                        p class=text-sm text-neutral-600 mt-12Designed for Group 3 Physics Reportp
+                    div
+                `
+            }
+        ];
+
+        let currentSlide = 0;
+        const totalSlides = slides.length;
+        const viewport = document.getElementById('slide-viewport');
+        const progressBar = document.getElementById('progress-bar');
+        const slideCounter = document.getElementById('slide-counter');
+
+        function renderSlide() {
+             Update Progress
+            const progress = ((currentSlide + 1)  totalSlides)  100;
+            progressBar.style.width = `${progress}%`;
+            slideCounter.textContent = `SLIDE ${currentSlide + 1}  ${totalSlides}`;
+
+            const slide = slides[currentSlide];
+            
+             Build Header
+            let headerHTML = '';
+            if (slide.title) {
+                headerHTML = `
+                    div class=absolute top-0 left-0 w-full flex items-center gap-3 border-b border-neutral-700 pb-4 mb-8
+                        div class=bg-neutral-800 p-2 rounded-lg text-red-500
+                            ${slide.icon}
+                        div
+                        h2 class=text-2xl mdtext-3xl font-bold tracking-wide${slide.title}h2
+                        div class=ml-auto text-neutral-500 font-mono text-xl
+                            ${slide.id  10  '0' + slide.id  slide.id}
+                        div
+                    div
+                `;
+            }
+
+             Build wrapper
+            const paddingTopClass = slide.title  'pt-24'  '';
+            const html = `
+                div class=w-full max-w-6xl aspect-video relative slide-wrapper
+                    ${headerHTML}
+                    div class=h-full w-full ${paddingTopClass}
+                        ${slide.content}
+                    div
+                div
+            `;
+            
+            viewport.innerHTML = html;
+
+             Update button states
+            document.getElementById('btn-prev').disabled = currentSlide === 0;
+            document.getElementById('btn-prev').style.opacity = currentSlide === 0  '0.3'  '1';
+        }
+
+         Render Print Layout (All Slides)
+        function setupPrint() {
+            const printContent = slides.map(slide = {
+                let headerHTML = '';
+                if (slide.title) {
+                    headerHTML = `
+                        div class=absolute top-0 left-0 w-full flex items-center gap-3 border-b border-neutral-700 pb-4 mb-8
+                            div class=bg-neutral-800 p-2 rounded-lg text-red-500${slide.icon}div
+                            h2 class=text-2xl mdtext-3xl font-bold tracking-wide${slide.title}h2
+                            div class=ml-auto text-neutral-500 font-mono text-xl${slide.id  10  '0' + slide.id  slide.id}div
+                        div
+                    `;
+                }
+                const paddingTopClass = slide.title  'pt-24'  '';
+                
+                return `
+                    div class=slide-container flex items-center justify-center p-12 bg-neutral-900 text-neutral-100 h-screen w-screen relative overflow-hidden page-break
+                        div class=w-full max-w-6xl aspect-video relative slide-wrapper
+                            ${headerHTML}
+                            div class=h-full w-full ${paddingTopClass}
+                                ${slide.content}
+                            div
+                        div
+                    div
+                `;
+            }).join('');
+            
+             This is a hack for print. When printing, we want to see all slides. 
+             The logic here is complex for a single file switcher.
+             Simplified The CSS @media print handles visibility if we inject all.
+             But we are rendering dynamically. 
+             For true printing of all slides in this dynamic setup, users should ideally use the React version.
+             Or we render ALL slides hidden, and show only active. 
+             For this HTML file, we will keep the dynamic render. Printing will print CURRENT slide only.
+             If they want to print all, they can reload the page where we could render all by default
+             Let's stick to interactive mode for simplicity in this HTML file.
+        }
+
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % totalSlides;
+            renderSlide();
+        }
+
+        function prevSlide() {
+            currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+            renderSlide();
+        }
+
+         Setup Icons into buttons
+        document.getElementById('icon-prev').innerHTML = icons.chevronLeft;
+        document.getElementById('icon-next').innerHTML = icons.chevronRight;
+        document.getElementById('icon-printer').innerHTML = icons.printer;
+
+         Initialize
+        renderSlide();
+
+         Keyboard Events
+        window.addEventListener('keydown', (e) = {
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+        });
+
+    script
+body
+html
